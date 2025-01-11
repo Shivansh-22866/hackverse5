@@ -1,5 +1,4 @@
-// pages/SignupPage.tsx
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +31,8 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const blobRef = useRef<HTMLDivElement | null>(null);
+  const [isOnLeftSide, setIsOnLeftSide] = useState(false); // Track whether we're on the left side
 
   const {
     register,
@@ -40,6 +41,32 @@ export const SignupPage: React.FC = () => {
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
+
+  // Track the mouse movement to move the blob
+  useEffect(() => {
+    console.log(isOnLeftSide)
+    const moveBlob = (e: MouseEvent) => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      // Check if the mouse is on the left side of the screen
+      setIsOnLeftSide(mouseX < window.innerWidth / 2);
+
+      if (blobRef.current && isOnLeftSide) {
+        // Update blob position
+        blobRef.current.style.left = `${mouseX - 48}px`;
+        blobRef.current.style.top = `${mouseY - 48}px`;
+      }
+    };
+
+    // Add mousemove event listener
+    document.addEventListener('mousemove', moveBlob);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener('mousemove', moveBlob);
+    };
+  }, [isOnLeftSide]); // Ensure this effect depends on `isOnLeftSide`
 
   const onSubmit = async (data: SignupFormData) => {
     try {
@@ -76,14 +103,14 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
       {/* Left Side */}
-      <div className="w-1/2 bg-gray-200 flex items-center justify-center">
-        <h1 className="text-3xl font-bold text-gray-700">Welcome to Our Platform</h1>
+      <div className="w-1/2 bg-gray-200 flex items-center justify-center relative">
+        <h1 className="text-3xl font-bold text-gray-700 z-10">Welcome to Our Platform</h1>
       </div>
 
       {/* Right Side */}
-      <div className="w-1/2 flex flex-col items-center justify-center bg-white px-8 py-6">
+      <div className="w-1/2 flex flex-col items-center justify-center bg-white px-8 py-6 relative z-10">
         <h2 className="text-3xl font-bold text-black-600 mb-2">Create an Account</h2>
         <p className="text-sm text-gray-500 mb-6">Enter your email and password below to continue</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full max-w-sm">
@@ -154,7 +181,29 @@ export const SignupPage: React.FC = () => {
             </Link>
           </p>
         </form>
+
       </div>
+
+      {isOnLeftSide && (
+        <div
+          ref={blobRef}
+          className="blob absolute -z-1 w-24 h-24 bg-blue-500 rounded-full opacity-50 pointer-events-none"
+          style={{
+            filter: 'url(#goo) blur(32px)', // Apply the blur filter
+          }}
+        />
+      )}
+
+      {/* SVG Filter for Blur */}
+      <svg xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+            <feBlend in="SourceGraphic" in2="goo" />
+          </filter>
+        </defs>
+      </svg>
     </div>
   );
 };
