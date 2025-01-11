@@ -18,10 +18,10 @@ export const DashboardPage: React.FC = () => {
 
   const fetchDsarRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/dsar/requests', {
+      const response = await fetch('http://localhost:5000/dsar/requests', {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
+        }
       });
       
       if (!response.ok) throw new Error('Failed to fetch DSAR requests');
@@ -45,7 +45,7 @@ export const DashboardPage: React.FC = () => {
     reader.onload = async (e) => {
       const text = e.target?.result as string;
       try {
-        const response = await fetch('http://localhost:5000/api/data/classify', {
+        const response = await fetch('http://localhost:5000/data/classify', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6 mt-20">
       <Card>
         <CardHeader>
           <CardTitle>Data Classification</CardTitle>

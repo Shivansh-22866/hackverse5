@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '../../contexts/AuthContext'; // Import useAuth to access authentication state
 import { useNavigate } from 'react-router-dom';
+import { Avatar } from './avatar';
+import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -51,9 +53,10 @@ const Navbar = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                      JD
-                    </div>
+                    <Avatar>
+                        <AvatarImage src="https://github.com/shadcn.png"/>
+                        <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
