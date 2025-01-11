@@ -32,7 +32,7 @@ router.get('/requests', async(req, res) => {
         
         res.json(requests);
       } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ msg: error.message });
       }
 })
 
