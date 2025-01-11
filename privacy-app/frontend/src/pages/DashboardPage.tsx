@@ -18,7 +18,7 @@ export const DashboardPage: React.FC = () => {
 
   const fetchDsarRequests = async () => {
     try {
-  
+
       const response = await fetch('http://localhost:5000/dsar/requests', {
         headers: {
           Authorization: token!,
@@ -45,34 +45,33 @@ export const DashboardPage: React.FC = () => {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const text = e.target?.result as string;
-      try {
-        const response = await fetch('http://localhost:5000/data/classify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token!,
-          },
-          body: JSON.stringify({ data: text }),
-        });
-        
-        if (!response.ok) throw new Error('Classification failed');
-        
-        const result = await response.json();
-        setClassificationResults(result.results);
-      } catch (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Failed to classify data.',
-        });
-      }
-    };
-    reader.readAsText(file);
+  
+    const formData = new FormData();
+    formData.append('file', file); // Append the file to FormData
+  
+    try {
+      const response = await fetch('http://localhost:5000/data/classify', {
+        method: 'POST',
+        headers: {
+          'Authorization': token!,  // Pass the token for authentication
+        },
+        body: formData,  // Send the FormData with the file
+      });
+  
+      if (!response.ok) throw new Error('Classification failed');
+  
+      const result = await response.json();
+      setClassificationResults(result.results);  // Update state with the classification results
+  
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to classify data.',
+      });
+    }
   };
+  
 
   return (
     <div className="container mx-auto py-6 space-y-6 mt-20">
