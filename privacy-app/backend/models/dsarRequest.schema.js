@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const dsarRequestSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     requestType: { type: String, required: true },
@@ -6,4 +8,4 @@ const dsarRequestSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
   });
 
-export default mongoose.model('DSARRequest', dsarRequestSchema);
+export const DSARRequest = mongoose.model('DSARRequest', dsarRequestSchema);
