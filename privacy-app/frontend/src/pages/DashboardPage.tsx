@@ -18,17 +18,22 @@ export const DashboardPage: React.FC = () => {
 
   const fetchDsarRequests = async () => {
     try {
+  
       const response = await fetch('http://localhost:5000/dsar/requests', {
         headers: {
-          Authorization: `Bearer ${token}`,
-        }
+          Authorization: token!,
+        },
       });
       
-      if (!response.ok) throw new Error('Failed to fetch DSAR requests');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || 'Failed to fetch DSAR requests');
+      }
       
       const data = await response.json();
       setDsarRequests(data);
     } catch (error) {
+      console.error('Fetch error:', error); 
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -36,7 +41,7 @@ export const DashboardPage: React.FC = () => {
       });
     }
   };
-
+  
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -49,7 +54,7 @@ export const DashboardPage: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: token!,
           },
           body: JSON.stringify({ data: text }),
         });
