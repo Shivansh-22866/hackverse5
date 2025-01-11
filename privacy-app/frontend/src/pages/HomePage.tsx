@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, Lock, Bell, ArrowRight, FileCheck, Users, Clock, Database } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,29 +14,36 @@ const TypewriterText = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      const targetWord = words[currentIndex % words.length];
+    let timeout: NodeJS.Timeout;
+    const targetWord = words[currentIndex % words.length];
 
-      if (!isDeleting) {
-        setCurrentWord(targetWord.slice(0, currentWord.length + 1));
+    if (!isDeleting) {
+      // Typing effect
+      timeout = setTimeout(() => {
+        setCurrentWord((prev) => targetWord.slice(0, prev.length + 1)); // Add one more character
         if (currentWord === targetWord) {
-          setTimeout(() => setIsDeleting(true), 1000);
+          // Wait before starting to delete
+          setTimeout(() => setIsDeleting(true), 2000);
         }
-      } else {
-        setCurrentWord(targetWord.slice(0, currentWord.length - 1));
-        if (currentWord === '') {
+      }, 150); // Typing speed
+    } else {
+      // Deleting effect
+      timeout = setTimeout(() => {
+        setCurrentWord((prev) => targetWord.slice(0, prev.length - 1)); // Remove one character
+        if (currentWord === "") {
           setIsDeleting(false);
-          setCurrentIndex((prev) => prev + 1);
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length); // Move to next word
         }
-      }
-    }, isDeleting ? 100 : 150);
+      }, 100); // Deleting speed
+    }
 
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout); // Cleanup timeout on component unmount or when state changes
   }, [currentWord, currentIndex, isDeleting]);
 
   return (
-    <span className="text-blue-600">
-      {currentWord}<span className="animate-pulse">|</span>
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+      {currentWord}
+      <span className="animate-pulse text-purple-500">|</span>
     </span>
   );
 };
@@ -69,19 +76,19 @@ const App = () => {
       detail: "Emails, Phone Numbers, IDs"
     },
     {
-      icon: <Clock className="w-8 h-8 text-blue-600" />,
+      icon: <Clock className="w-8 h-8 text-indigo-600" />,
       title: "Response Time",
       description: "Streamlined DSAR processing workflow",
       detail: "24-48 hour SLA"
     },
     {
-      icon: <Database className="w-8 h-8 text-blue-600" />,
+      icon: <Database className="w-8 h-8 text-pink-600" />,
       title: "Data Formats",
       description: "Supporting multiple file formats",
       detail: "CSV, XLSX, JSON"
     },
     {
-      icon: <Users className="w-8 h-8 text-blue-600" />,
+      icon: <Users className="w-8 h-8 text-purple-600" />,
       title: "Team Access",
       description: "Multi-user access management",
       detail: "Admin and user roles"
