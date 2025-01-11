@@ -7,11 +7,13 @@ import { SignupPage } from './pages/SignUpPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { Toaster } from '@/components/ui/toaster';
 import HomePage from './pages/HomePage';
+import Navbar from './components/ui/Navbar';
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
+        <Navbar/>
         <Routes>
           {/* Public routes - only accessible when not logged in */}
           <Route 

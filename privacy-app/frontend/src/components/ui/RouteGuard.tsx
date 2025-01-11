@@ -16,10 +16,5 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireAuth })
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!requireAuth && token) {
-    // Redirect to dashboard if user is authenticated but tries to access public routes
-    return <Navigate to="/dashboard" replace />;
-  }
-
   return <>{children}</>;
 };
