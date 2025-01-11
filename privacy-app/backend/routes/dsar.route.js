@@ -24,21 +24,17 @@ router.post('/submit', authMiddleware, async(req, res) => {
     }
 })
 
-router.get('/requests', authMiddleware, async(req, res) => {
-    try {
-        // const requests = await DSARRequest.find({
-        //   ...(req.user.role !== 'admin' ? { userId: req.user.userId } : {})
-        // }).populate('userId', 'email');
-        
-        // res.json(requests);
-        res.json({msg: "DSAR request submitted successfully!"})
-      } catch (error) {        // const requests = await DSARRequest.find({
-        //   ...(req.user.role !== 'admin' ? { userId: req.user.userId } : {})
-        // }).populate('userId', 'email');
-        
-        // res.json(requests);
-        res.status(500).json({ msg: error.message });
-      }
-})
+router.get('/requests', authMiddleware, async (req, res) => {
+  try {
+    const requests = await DSARRequest.find({
+      ...(req.user.role !== 'admin' ? { userId: req.user._id } : {})
+    }).populate('userId', 'email');
+
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 
 export default router
