@@ -9,7 +9,7 @@ router.post('/submit', authMiddleware, async(req, res) => {
         const {requestType, description} = req.body
 
         const dsarRequest = new DSARRequest({
-            userId: req.user._id,
+            userId: req.user.userId,
             requestType,
             description
         })
@@ -24,16 +24,20 @@ router.post('/submit', authMiddleware, async(req, res) => {
     }
 })
 
-router.get('/requests', async(req, res) => {
-    try {
-        const requests = await DSARRequest.find({
-          ...(req.user.role !== 'admin' ? { userId: req.user.userId } : {})
-        }).populate('userId', 'email');
-        
-        res.json(requests);
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
-})
+router.get('/requests', authMiddleware, async (req, res) => {
+  console.log(req.user.userId)
+  try {
+    const request = await DSARRequest.find({}).populate('userId', 'email');
+    console.log(request)
+    const requests = await DSARRequest.find({
+      ...(req.user.role !== 'admin' ? { userId: req.user.userId } : {})
+    }).populate('userId', 'email');
+
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 
 export default router
