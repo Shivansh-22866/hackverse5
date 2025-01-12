@@ -1,10 +1,21 @@
+from datetime import datetime
+import sqlite3
+
+
+
+
 def assign_compliance_metadata(match, category):
-    compliance_requirements = {
-        "email": "GDPR",
-        "phone_number": "GDPR, CCPA",
-        "credit_card": "PCI-DSS",
-        "ssn": "HIPAA, GDPR",
-        "ip_address": "GDPR",
-        "date": "General"
-    }
-    return compliance_requirements.get(category, "General")
+    compliance_rules = {
+    "email": ["GDPR Article 32"],
+    "phone_number": ["GDPR Article 32", "CCPA"],
+    "credit_card": ["PCI DSS", "CCPA"],
+    "ssn": ["HIPAA", "CCPA"],
+    "ip_address": ["GDPR Article 32"],
+    "date": ["GDPR Article 32"],
+    "customer_id": ["CCPA"],
+    "business_id": ["CCPA"]
+}
+    return compliance_rules.get(category, "General")
+
+
+
