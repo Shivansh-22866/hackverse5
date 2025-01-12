@@ -12,7 +12,7 @@ export const DashboardPage: React.FC = () => {
   const { toast } = useToast();
   const [classificationResults, setClassificationResults] = useState<DataClassificationResult | null>(null);
   const [dsarRequests, setDsarRequests] = useState<DSARRequest[]>([]);
-  const [requestType, setRequestType] = useState<string>('delete'); // Default request type
+  const [requestType, setRequestType] = useState<string>('delete');
   const [description, setDescription] = useState<string>('');
   const [isRequestSubmitted, setIsRequestSubmitted] = useState<boolean>(false);
 
@@ -50,22 +50,21 @@ export const DashboardPage: React.FC = () => {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append('file', file); // Append the file to FormData
+    formData.append('file', file);
 
     try {
       const response = await fetch('http://localhost:5000/data/classify', {
         method: 'POST',
         headers: {
-          'Authorization': token!,  // Pass the token for authentication
+          Authorization: token!,
         },
-        body: formData,  // Send the FormData with the file
+        body: formData,
       });
 
       if (!response.ok) throw new Error('Classification failed');
 
       const result = await response.json();
-      setClassificationResults(result.results);  // Update state with the classification results
-
+      setClassificationResults(result.results);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -89,7 +88,7 @@ export const DashboardPage: React.FC = () => {
       const response = await fetch('http://localhost:5000/dsar/submit', {
         method: 'POST',
         headers: {
-          'Authorization': token!,
+          Authorization: token!,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ requestType, description }),
@@ -100,14 +99,13 @@ export const DashboardPage: React.FC = () => {
         throw new Error(errorData.msg || 'Failed to submit DSAR request');
       }
 
-      setIsRequestSubmitted(true); // Mark the request as submitted
+      setIsRequestSubmitted(true);
       toast({
         variant: 'default',
         title: 'DSAR Request Submitted',
         description: 'Your DSAR request has been successfully submitted.',
       });
 
-      // Optionally, refresh the DSAR requests list
       fetchDsarRequests();
     } catch (error) {
       console.error('Error submitting DSAR request:', error);
@@ -121,21 +119,36 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6 mt-20">
-      <Card>
+      {/* Data Classification */}
+      <Card className="bg-gradient-to-r from-indigo-400 to-purple-400 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2">
         <CardHeader>
-          <CardTitle>Data Classification</CardTitle>
+          <CardTitle className="text-2xl font-extrabold tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>Data Classification</CardTitle>
         </CardHeader>
         <CardContent>
+          <p className="text-lg text-gray-100 mb-4">
+            Upload your data files to classify sensitive information quickly and efficiently. Gain insights into your data with advanced classification techniques.
+          </p>
           <div className="space-y-4">
+            <label
+              htmlFor="file-upload"
+              className="cursor-pointer inline-block px-4 py-2 bg-gray-300 text-gray-800 font-medium rounded-md hover:bg-gray-400 transition-all"
+            >
+              Upload File
+            </label>
             <Input
+              id="file-upload"
               type="file"
               onChange={handleFileUpload}
               accept=".csv,.txt,.xlsx"
+              className="hidden"
             />
             {classificationResults && (
               <div className="grid grid-cols-3 gap-4">
                 {Object.entries(classificationResults).map(([type, count]) => (
-                  <Card key={type}>
+                  <Card
+                    key={type}
+                    className="bg-white text-indigo-400 border border-indigo-400 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  >
                     <CardContent className="pt-6">
                       <div className="text-2xl font-bold">{count}</div>
                       <div className="text-sm text-muted-foreground">{type}</div>
@@ -148,19 +161,20 @@ export const DashboardPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* DSAR Request */}
       {classificationResults && !isRequestSubmitted && (
-        <Card>
+        <Card className="bg-gradient-to-r from-purple-400 to-indigo-400 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2">
           <CardHeader>
-            <CardTitle>Submit DSAR Request</CardTitle>
+            <CardTitle className="text-2xl font-extrabold tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>Submit DSAR Request</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Request Type</label>
+                <label className="block text-sm font-medium text-white">Request Type</label>
                 <select
                   value={requestType}
                   onChange={(e) => setRequestType(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                  className="mt-1 block w-full p-2 border border-pink-400 rounded-md shadow-sm text-gray-800"
                 >
                   <option value="delete">Delete Data</option>
                   <option value="access">Access Data</option>
@@ -169,16 +183,19 @@ export const DashboardPage: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-medium text-white">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                  className="mt-1 block w-full p-2 border border-purple-500 rounded-md shadow-sm text-gray-800"
                   rows={4}
                   placeholder="Provide a description of the request"
                 />
               </div>
-              <Button onClick={handleDSARRequest} disabled={!description}>
+              <Button
+                onClick={handleDSARRequest}
+                className="bg-indigo-400 hover:bg-indigo-600 text-white shadow-lg"
+              >
                 Submit Request
               </Button>
             </div>
@@ -186,29 +203,35 @@ export const DashboardPage: React.FC = () => {
         </Card>
       )}
 
-      <Card>
+      {/* DSAR Requests Table */}
+      <Card className="bg-gradient-to-r from-purple-400 to-indigo-400 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2">
         <CardHeader>
-          <CardTitle>DSAR Requests</CardTitle>
+          <CardTitle className="text-2xl font-extrabold tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>DSAR Requests</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead className="text-gray-800">Type</TableHead>
+                <TableHead className="text-gray-800">Status</TableHead>
+                <TableHead className="text-gray-800">Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {dsarRequests.map((request) => (
-                <TableRow key={request._id}>
+                <TableRow
+                  key={request._id}
+                  className="hover:bg-purple-400 hover:text-white transition-all duration-300"
+                >
                   <TableCell>{request.requestType}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      request.status === 'pending' 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        request.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                    >
                       {request.status}
                     </span>
                   </TableCell>
@@ -224,3 +247,6 @@ export const DashboardPage: React.FC = () => {
     </div>
   );
 };
+
+
+
